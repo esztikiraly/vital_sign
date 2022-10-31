@@ -16,6 +16,7 @@ namespace vital_sign
     {
         SerialPort serial_port = new SerialPort();
         Timer t = new Timer();
+        UInt16 dataSensor1, dataSensor2, dataSensor3;
         public Form1()
         {
             InitializeComponent();
@@ -23,7 +24,7 @@ namespace vital_sign
             comboBox1.Items.AddRange(ports);
             SerialPort serial_port = new SerialPort();
             label1.Text = "Port is closed";
-            t.Interval = 100;
+            t.Interval = 500;
             t.Enabled = false;
         }
 
@@ -82,19 +83,24 @@ namespace vital_sign
 
         private void T_Tick(object sender, EventArgs e)
         {
+
+
+
             GetData();
-
-
 
         }
 
+        private void button4_Click(object sender, EventArgs e)
+        {
+        
+        }
 
 
         //Methods
         private void GetData()
         {
             string incoming_data = ASCIIToDecimal(serial_port.ReadExisting().ToString());
-            richTextBox1.Text = incoming_data;
+            richTextBox1.Text += incoming_data;
         }
         public static string ASCIIToDecimal(string str)
         {
