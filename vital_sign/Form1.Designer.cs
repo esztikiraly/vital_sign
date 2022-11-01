@@ -88,7 +88,7 @@
             this.lineChart1.Name = "lineChart1";
             this.lineChart1.Padding = new System.Windows.Forms.Padding(5);
             this.lineChart1.ShowLegend = true;
-            this.lineChart1.Size = new System.Drawing.Size(850, 462);
+            this.lineChart1.Size = new System.Drawing.Size(908, 496);
             this.lineChart1.SubtitleFontName = null;
             this.lineChart1.SubtitleFontSize = null;
             this.lineChart1.SubtitleFontStyle = null;
@@ -105,7 +105,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(979, 486);
+            this.ClientSize = new System.Drawing.Size(1037, 520);
             this.Controls.Add(this.lineChart1);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);

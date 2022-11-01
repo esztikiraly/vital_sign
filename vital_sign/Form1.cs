@@ -12,6 +12,7 @@ using System.Windows.Forms.VisualStyles;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Diagnostics;
 using MindFusion.Charting;
+using MindFusion.Drawing;
 
 namespace vital_sign
 {
@@ -51,6 +52,38 @@ namespace vital_sign
             lineChart1.Series.Add(series1);
             lineChart1.Series.Add(series2);
             lineChart1.Series.Add(series3);
+
+            lineChart1.Title = "ECG Data";
+            lineChart1.ShowXCoordinates = false;
+            lineChart1.ShowLegendTitle = false;
+
+            lineChart1.XAxis.Title = "";
+            lineChart1.XAxis.MinValue = 0;
+            lineChart1.XAxis.MaxValue = 120;
+            lineChart1.XAxis.Interval = 10;
+
+            lineChart1.YAxis.MinValue = 0;
+            lineChart1.YAxis.MaxValue = 100;
+            lineChart1.YAxis.Interval = 10;
+
+            List<MindFusion.Drawing.Brush> brushes = new List<MindFusion.Drawing.Brush>()
+            {
+                new MindFusion.Drawing.SolidBrush(Color.BlueViolet),
+                new MindFusion.Drawing.SolidBrush(Color.Brown),
+                new MindFusion.Drawing.SolidBrush(Color.Coral)
+            };
+
+            List<double> thicknesses = new List<double>() { 2 };
+
+            PerSeriesStyle style = new PerSeriesStyle(brushes, brushes, thicknesses, null);
+            lineChart1.Plot.SeriesStyle=style;
+            lineChart1.Theme.PlotBackground = new MindFusion.Drawing.SolidBrush(Color.White);
+            lineChart1.Theme.GridLineColor = Color.LightGray;
+            lineChart1.Theme.GridLineStyle = System.Drawing.Drawing2D.DashStyle.Dash;
+            lineChart1.TitleMargin = new MindFusion.Charting.Margins(10);
+            lineChart1.GridType = GridType.Horizontal;
+
+
 
             t.Tick += T_Tick;
             t.Interval = 500;
