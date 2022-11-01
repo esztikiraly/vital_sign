@@ -150,6 +150,42 @@ namespace vital_sign
             }
         }
 
+        public DateTime MinDate
+        {
+            get { return minDate; }
+            set
+            {
+                if(minDate == value)
+                    return ;
+                minDate = value;
+                OnDataChanged ();
+            }
+        }
+
+        public DateTime MaxDate
+        {
+            get { return maxDate; }
+            set
+            {
+                if (maxDate == value)
+                    return;
+                maxDate = value;
+                OnDataChanged () ;
+            }
+        }
+
+        public string CustomDateTimeFormat
+        {
+                get { return customDateTimeFormat; }
+            set
+            {
+                if (customDateTimeFormat == value)
+                    return;
+                customDateTimeFormat = value;
+                OnDataChanged ();
+            }
+        }
+
 
         //start of series
         DateTime start;
