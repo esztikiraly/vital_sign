@@ -43,24 +43,12 @@ namespace vital_sign
                 MessageBox.Show(ex.ToString());
             }
 
-            GetData();
+           
 
         }
 
-        private void GetData()
-        {
-            string output = ASCIIToDecimal(serialPort1.ReadLine()).ToString();
-
-            StreamWriter sw = new StreamWriter("data.txt");
-            string[] s = output.Split('1');
-
-            for (int i = 0; i < s.Length; i++)
-            {
-                sw.WriteLine(s[i]);
-            }
-
-            sw.Close();
-        }
+        
+        
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -154,18 +142,7 @@ namespace vital_sign
             {
                 t.Start();
 
-                StreamReader sr = new StreamReader("data.txt",Encoding.Default);
-                while (!sr.EndOfStream)
-                {
-                    string line = sr.ReadLine();
-                    if (line!="")
-                    {
-                        data.Add(double.Parse(line));
-                    }
-                    
-                }
-
-             sr.Close();
+              
             }
         }
 
@@ -178,21 +155,12 @@ namespace vital_sign
 
         private void T_Tick(object sender, EventArgs e)
         {
-            GetData();
+           string incoming_data = ASCIIToDecimal(serialPort1.ReadLine()).ToString();
+            richTextBox1.Text = incoming_data;
 
-            try
-            {
-                double val = data[i];
-                i++;
-                // double val = 20;
-                series1.addValue(val);
-                Console.WriteLine(val);
-            }
-            catch (Exception ex)
-            {
-
-                t.Stop();
-            }
+            double val = rnd.NextDouble()*10 + 50;
+            series1.addValue(val);
+            Console.WriteLine(val);
 
             if (series1.Size > 1)
             {
