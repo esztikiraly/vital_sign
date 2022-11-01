@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
+using System.Windows.Forms.DataVisualization.Charting;
+using System.Diagnostics;
 
 namespace vital_sign
 {
@@ -16,16 +18,33 @@ namespace vital_sign
     {
         SerialPort serial_port = new SerialPort();
         Timer t = new Timer();
-        UInt16 dataSensor1, dataSensor2, dataSensor3;
+        Timer t2 = new Timer();
+        double rt = 0;
+        bool i = false;
+        List<string> list = new List<string>();
+
+
         public Form1()
         {
             InitializeComponent();
             string[] ports = SerialPort.GetPortNames();
             comboBox1.Items.AddRange(ports);
-            SerialPort serial_port = new SerialPort();
+            serial_port = new SerialPort
+            {
+                Parity = Parity.None,
+                Handshake = Handshake.None
+            };
             label1.Text = "Port is closed";
-            t.Interval = 500;
+            t.Interval = 100;
             t.Enabled = false;
+            t2.Interval = 100;
+            t2.Enabled = true;
+            t2.Tick += T2_Tick;
+        }
+
+        private void T2_Tick(object sender, EventArgs e)
+        {
+            rt = rt + 0.1;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -69,7 +88,9 @@ namespace vital_sign
                 {
                     t.Enabled = true;
                     t.Tick += T_Tick;
-                    GetData();
+                    
+
+                    // GetData();
                 }
 
             }
@@ -79,28 +100,24 @@ namespace vital_sign
             }
         }
 
-     
+
 
         private void T_Tick(object sender, EventArgs e)
         {
-
-
 
             GetData();
 
         }
 
-        private void button4_Click(object sender, EventArgs e)
-        {
-        
-        }
 
 
         //Methods
+
+
         private void GetData()
         {
-            string incoming_data = ASCIIToDecimal(serial_port.ReadExisting().ToString());
-            richTextBox1.Text += incoming_data;
+            string data = serial_port.ReadLine().ToString();
+            richTextBox1.Text += data;
         }
         public static string ASCIIToDecimal(string str)
         {
@@ -118,5 +135,17 @@ namespace vital_sign
 
             return dec;
         }
+
+        private void Form1_FormClosed(object sender, EventArgs e)
+        {
+            serial_port.Close();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+     
     }
 }
