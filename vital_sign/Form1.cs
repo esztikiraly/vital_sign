@@ -13,15 +13,90 @@ using System.Windows.Forms.DataVisualization.Charting;
 using System.Diagnostics;
 using MindFusion.Charting;
 using MindFusion.Drawing;
+using System.IO;
 
 namespace vital_sign
 {
     public partial class Form1 : Form
     {
-        EKG_data series1, series2, series3;
+        EKG_data series1;
         Timer t = new Timer();
         Random rnd = new Random();
+        SerialPort serialPort1 = new SerialPort();
+        int i = 0;
+        List<double> data = new List<double>();
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                serialPort1.PortName = comboBox1.Text;
+                serialPort1.Open();
+                btn_open.Enabled = false;
+                btn_closed.Enabled = true;
+                label1.Text = "Port is opened.";
+                progressBar1.Visible = true;
+                progressBar1.Value = 100;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+
+            GetData();
+
+        }
+
+        private void GetData()
+        {
+            string output = ASCIIToDecimal(serialPort1.ReadLine()).ToString();
+
+            StreamWriter sw = new StreamWriter("data.txt");
+            string[] s = output.Split('1');
+
+            for (int i = 0; i < s.Length; i++)
+            {
+                sw.WriteLine(s[i]);
+            }
+
+            sw.Close();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            string[] ports = SerialPort.GetPortNames();
+            comboBox1.Items.AddRange(ports);
+            btn_closed.Enabled = false;
+            btn_open.Enabled = true;
+            progressBar1.Visible = false;
+            
+        }
+        private void Form1_Close(object sender, EventArgs e)
+        {
+            serialPort1.Close();
+            Application.Exit();
+
+
+        }
+
+
+        private void btn_closed_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                serialPort1.Close();
+                btn_closed.Enabled = false;
+                btn_open.Enabled=true;
+                label1.Text = "Port is closed.";
+                progressBar1.Value=0;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+        
         public Form1()
         {
             InitializeComponent();
@@ -30,28 +105,11 @@ namespace vital_sign
             series1.LabelInterval = 10;
             series1.MinValue = 0;
             series1.MaxValue = 120;
-            series1.Title = "Server 1";
+            series1.Title = "ECG";
             series1.SupportedLabels = LabelKinds.XAxisLabel;
 
-            series2 = new EKG_data(DateTime.Now, DateTime.Now, DateTime.Now.AddMinutes(1));
-            series2.DateTimeFormat = DateTimeFormat.LongTime;
-            series2.LabelInterval = 10;
-            series2.MinValue = 0;
-            series2.MaxValue = 120;
-            series2.Title = "Server 2";
-            series2.SupportedLabels = LabelKinds.None;
-
-            series3 = new EKG_data(DateTime.Now, DateTime.Now, DateTime.Now.AddMinutes(1));
-            series3.DateTimeFormat = DateTimeFormat.LongTime;
-            series3.LabelInterval = 10;
-            series3.MinValue = 0;
-            series3.MaxValue = 120;
-            series3.Title = "Server 3";
-            series3.SupportedLabels = LabelKinds.None;
 
             lineChart1.Series.Add(series1);
-            lineChart1.Series.Add(series2);
-            lineChart1.Series.Add(series3);
 
             lineChart1.Title = "ECG Data";
             lineChart1.ShowXCoordinates = false;
@@ -86,21 +144,55 @@ namespace vital_sign
 
 
             t.Tick += T_Tick;
-            t.Interval = 500;
-            t.Start();
+            t.Interval = 100;
+           
         }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            if (serialPort1.IsOpen)
+            {
+                t.Start();
+
+                StreamReader sr = new StreamReader("data.txt",Encoding.Default);
+                while (!sr.EndOfStream)
+                {
+                    string line = sr.ReadLine();
+                    if (line!="")
+                    {
+                        data.Add(double.Parse(line));
+                    }
+                    
+                }
+
+             sr.Close();
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            t.Stop();
+        }
+
+
 
         private void T_Tick(object sender, EventArgs e)
         {
-            double val = rnd.NextDouble()*10+10;
-            series1.addValue(val);
+            GetData();
 
-            val = rnd.NextDouble()*10+40;
-            series2.addValue(val);
+            try
+            {
+                double val = data[i];
+                i++;
+                // double val = 20;
+                series1.addValue(val);
+                Console.WriteLine(val);
+            }
+            catch (Exception ex)
+            {
 
-            val = rnd.NextDouble() * 10 + 60;
-            series3.addValue(val);
-            Console.WriteLine(val);
+                t.Stop();
+            }
 
             if (series1.Size > 1)
             {
@@ -114,6 +206,23 @@ namespace vital_sign
                 lineChart1.ChartPanel.InvalidateLayout();
             }
 
+        }
+
+        public static string ASCIIToDecimal(string str)
+        {
+            string dec = string.Empty;
+
+            for (int i = 0; i < str.Length; ++i)
+            {
+                string cDec = ((byte)str[i]).ToString();
+
+                if (cDec.Length < 3)
+                    cDec = cDec.PadLeft(3, '0');
+
+                dec += cDec;
+            }
+
+            return dec;
         }
     }
 }
