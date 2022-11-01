@@ -173,6 +173,29 @@ namespace vital_sign
                 OnDataChanged () ;
             }
         }
+        public double MinValue
+        {
+            get { return minValue; }
+            set
+            {
+                if (minValue == value)
+                    return;
+                minValue = value;
+                OnDataChanged();
+            }
+        }
+
+        public double MaxValue
+        {
+            get { return maxValue; }
+            set
+            {
+                if (maxValue == value)
+                    return;
+                maxValue = value;
+                OnDataChanged() ;
+            }
+        }
 
         public string CustomDateTimeFormat
         {

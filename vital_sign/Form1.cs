@@ -11,141 +11,77 @@ using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Diagnostics;
+using MindFusion.Charting;
 
 namespace vital_sign
 {
     public partial class Form1 : Form
     {
-        SerialPort serial_port = new SerialPort();
+        EKG_data series1, series2, series3;
         Timer t = new Timer();
-        Timer t2 = new Timer();
-        double rt = 0;
-        bool i = false;
-        List<string> list = new List<string>();
-
+        Random rnd = new Random();
 
         public Form1()
         {
             InitializeComponent();
-            string[] ports = SerialPort.GetPortNames();
-            comboBox1.Items.AddRange(ports);
-            serial_port = new SerialPort
-            {
-                Parity = Parity.None,
-                Handshake = Handshake.None
-            };
-            label1.Text = "Port is closed";
-            t.Interval = 100;
-            t.Enabled = false;
-            t2.Interval = 100;
-            t2.Enabled = true;
-            t2.Tick += T2_Tick;
+            series1 = new EKG_data(DateTime.Now, DateTime.Now, DateTime.Now.AddMinutes(1));
+            series1.DateTimeFormat = DateTimeFormat.LongTime;
+            series1.LabelInterval = 10;
+            series1.MinValue = 0;
+            series1.MaxValue = 120;
+            series1.Title = "Server 1";
+            series1.SupportedLabels = LabelKinds.XAxisLabel;
+
+            series2 = new EKG_data(DateTime.Now, DateTime.Now, DateTime.Now.AddMinutes(1));
+            series2.DateTimeFormat = DateTimeFormat.LongTime;
+            series2.LabelInterval = 10;
+            series2.MinValue = 0;
+            series2.MaxValue = 120;
+            series2.Title = "Server 2";
+            series2.SupportedLabels = LabelKinds.None;
+
+            series3 = new EKG_data(DateTime.Now, DateTime.Now, DateTime.Now.AddMinutes(1));
+            series3.DateTimeFormat = DateTimeFormat.LongTime;
+            series3.LabelInterval = 10;
+            series3.MinValue = 0;
+            series3.MaxValue = 120;
+            series3.Title = "Server 3";
+            series3.SupportedLabels = LabelKinds.None;
+
+            lineChart1.Series.Add(series1);
+            lineChart1.Series.Add(series2);
+            lineChart1.Series.Add(series3);
+
+            t.Tick += T_Tick;
+            t.Interval = 500;
+            t.Start();
         }
-
-        private void T2_Tick(object sender, EventArgs e)
-        {
-            rt = rt + 0.1;
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                serial_port.PortName = comboBox1.Text;
-                serial_port.Open();
-                label1.Text = "Port is open.";
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
-
-
-
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            try
-            {
-
-                serial_port.Close();
-                label1.Text = "Port is closed.";
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
-        }
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                if (serial_port.IsOpen)
-                {
-                    t.Enabled = true;
-                    t.Tick += T_Tick;
-                    
-
-                    // GetData();
-                }
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
-        }
-
-
 
         private void T_Tick(object sender, EventArgs e)
         {
+            double val = rnd.NextDouble()*10+10;
+            series1.addValue(val);
 
-            GetData();
+            val = rnd.NextDouble()*10+40;
+            series2.addValue(val);
 
-        }
+            val = rnd.NextDouble() * 10 + 60;
+            series3.addValue(val);
+            Console.WriteLine(val);
 
-
-
-        //Methods
-
-
-        private void GetData()
-        {
-            string data = serial_port.ReadLine().ToString();
-            richTextBox1.Text += data;
-        }
-        public static string ASCIIToDecimal(string str)
-        {
-            string dec = string.Empty;
-
-            for (int i = 0; i < str.Length; ++i)
+            if (series1.Size > 1)
             {
-                string cDec = ((byte)str[i]).ToString();
-
-                if (cDec.Length < 3)
-                    cDec = cDec.PadLeft(3, '0');
-
-                dec += cDec;
+                double currVal = series1.GetValue(series1.Size - 1, 0);
+                if (currVal > lineChart1.XAxis.MaxValue)
+                {
+                    double span = currVal - series1.GetValue(series1.Size - 2, 0);
+                    lineChart1.XAxis.MinValue += span;
+                    lineChart1.XAxis.MaxValue += span;
+                }
+                lineChart1.ChartPanel.InvalidateLayout();
             }
 
-            return dec;
         }
-
-        private void Form1_FormClosed(object sender, EventArgs e)
-        {
-            serial_port.Close();
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
-
-     
     }
 }
+
