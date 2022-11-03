@@ -24,67 +24,9 @@ namespace vital_sign
         Random rnd = new Random();
         SerialPort serialPort1 = new SerialPort();
         List<double> data = new List<double>();
+        double R1 = 0;
+        double R2 = 0;
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                serialPort1.PortName = comboBox1.Text;
-                serialPort1.BaudRate = 9600;
-                serialPort1.Open();
-                btn_open.Enabled = false;
-                btn_closed.Enabled = true;
-                label1.Text = "Port is opened.";
-                progressBar1.Visible = true;
-                progressBar1.Value = 100;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
-
-           
-
-        }
-
-        
-        
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            string[] ports = SerialPort.GetPortNames();
-            comboBox1.Items.AddRange(ports);
-            btn_closed.Enabled = false;
-            btn_open.Enabled = true;
-            progressBar1.Visible = false;
-            
-        }
-        private void Form1_Close(object sender, EventArgs e)
-        {
-            serialPort1.Close();
-            Application.Exit();
-
-
-        }
-
-
-        private void btn_closed_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                serialPort1.Close();
-                btn_closed.Enabled = false;
-                btn_open.Enabled=true;
-                label1.Text = "Port is closed.";
-                progressBar1.Value=0;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
-        }
-
-        
         public Form1()
         {
             InitializeComponent();
@@ -96,21 +38,17 @@ namespace vital_sign
             series1.Title = "ECG";
             series1.SupportedLabels = LabelKinds.XAxisLabel;
 
-           
             lineChart1.Series.Add(series1);
-
             lineChart1.Title = "ECG Data";
             lineChart1.ShowXCoordinates = false;
             lineChart1.ShowLegendTitle = false;
-
             lineChart1.XAxis.Title = "";
             lineChart1.XAxis.MinValue = 0;
-            lineChart1.XAxis.MaxValue = 10;
-            lineChart1.XAxis.Interval = 10;
-
+            lineChart1.XAxis.MaxValue = 5;
+            lineChart1.XAxis.Interval = 0.04;
             lineChart1.YAxis.MinValue = 0;
-            lineChart1.YAxis.MaxValue = 25;
-            lineChart1.YAxis.Interval = 5;
+            lineChart1.YAxis.MaxValue = 250;
+            lineChart1.YAxis.Interval = 15;
 
             List<MindFusion.Drawing.Brush> brushes = new List<MindFusion.Drawing.Brush>()
             {
@@ -121,53 +59,151 @@ namespace vital_sign
 
             List<double> thicknesses = new List<double>() { 2 };
 
+            //chart styles
             PerSeriesStyle style = new PerSeriesStyle(brushes, brushes, thicknesses, null);
-            lineChart1.Plot.SeriesStyle=style;
+            lineChart1.Plot.SeriesStyle = style;
             lineChart1.Theme.PlotBackground = new MindFusion.Drawing.SolidBrush(Color.White);
             lineChart1.Theme.GridLineColor = Color.LightGray;
             lineChart1.Theme.GridLineStyle = System.Drawing.Drawing2D.DashStyle.Dash;
             lineChart1.TitleMargin = new MindFusion.Charting.Margins(10);
             lineChart1.GridType = GridType.Horizontal;
 
-
-
+            //timer
             t.Tick += T_Tick;
             t.Interval = 40;
-           
         }
 
-        private void button1_Click_1(object sender, EventArgs e)
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            string[] ports = SerialPort.GetPortNames();
+            comboBox1.Items.AddRange(ports);
+            btn_closed.Enabled = false;
+            btn_open.Enabled = true;
+            btn_start.Enabled = false;
+            btn_stop.Enabled = false;
+        }
+
+
+        //Opening the port
+        private void btn_start_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                serialPort1.PortName = comboBox1.Text;
+                serialPort1.BaudRate = 9600;
+                serialPort1.Open();
+                btn_open.Enabled = false;
+                btn_closed.Enabled = true;
+                label1.Text = "Port is opened.";
+                btn_start.Enabled = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+        
+       
+
+        //closing the port
+        private void btn_closed_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                serialPort1.Close();
+                btn_closed.Enabled = false;
+                btn_open.Enabled=true;
+                label1.Text = "Port is closed.";
+                
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+       
+
+        //start the visualisation
+        private void btn_start_Click_1(object sender, EventArgs e)
         {
             if (serialPort1.IsOpen)
             {
+               // if (ujra) lineChart1.Series.Remove(series1);
                 t.Start();
-
-              
+                btn_stop.Enabled = true;
+                btn_start.Enabled = false;
+              btn_closed.Enabled = false;
             }
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        //Stop(freeze) the visualisation
+        private void btnSop_Click(object sender, EventArgs e)
         {
             t.Stop();
+            btn_start.Enabled=true;
+            btn_stop.Enabled = false;
+            btn_closed.Enabled = true;
         }
+
 
         double sum =0;
         int counter = 0;
         double avg = 0;
-
+        double max = 0;
+        double min = 200;
         private void T_Tick(object sender, EventArgs e)
         {
-            byte incoming_data = (byte)serialPort1.ReadByte();
-            double converted_data = (incoming_data / 10);
-            richTextBox1.Text += converted_data.ToString() + "\n";
 
-            sum += converted_data;
+            //Get the data from the port 
+            byte incoming_data = (byte)serialPort1.ReadByte();
+
+            //Filter data
+            
+
+
+            //showing the max and min value
+            if (incoming_data > max) max = incoming_data;
+            if (incoming_data < min) min = incoming_data;
+
+            //calculating avg and sum
+            sum += incoming_data;
             counter++;
             avg = sum / counter;
 
-            double val = converted_data;
-            series1.addValue(val);
+            //show data on the chart
+            double val = incoming_data;
+            if (incoming_data > 0)
+                series1.addValue(val);
             Console.WriteLine(val);
+
+            //max and min value
+            label2.Text= max.ToString();
+            label4.Text= min.ToString();
+
+            //heart rate calculation
+            if (incoming_data > 20)
+            {
+                if (R1 == 0)
+                {
+                    R1 = counter;
+                }
+                else
+                {
+                    if (R2 == 0)
+                    {
+                        R2 = counter;
+                        double RR = R2 - R1;
+                        lbl_hr.Text = (1500/RR).ToString();
+                        R1 = 0;
+                        R2 = 0;
+                    }
+                   
+                }
+
+               
+
+            }    
+
 
             if (series1.Size > 1)
             {
@@ -183,7 +219,24 @@ namespace vital_sign
 
         }
 
-        public static string ASCIIToDecimal(string str)
+       
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //Other
+    public static string ASCIIToDecimal(string str)
         {
             string dec = string.Empty;
 
@@ -199,6 +252,16 @@ namespace vital_sign
 
             return dec;
         }
+
+
+        private void Form1_Close(object sender, EventArgs e)
+        {
+            serialPort1.Close();
+            Application.Exit();
+
+
+        }
+
     }
 }
 
