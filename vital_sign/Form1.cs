@@ -23,7 +23,6 @@ namespace vital_sign
         Timer t = new Timer();
         Random rnd = new Random();
         SerialPort serialPort1 = new SerialPort();
-        int i = 0;
         List<double> data = new List<double>();
 
         private void button1_Click(object sender, EventArgs e)
@@ -31,6 +30,7 @@ namespace vital_sign
             try
             {
                 serialPort1.PortName = comboBox1.Text;
+                serialPort1.BaudRate = 9600;
                 serialPort1.Open();
                 btn_open.Enabled = false;
                 btn_closed.Enabled = true;
@@ -88,15 +88,15 @@ namespace vital_sign
         public Form1()
         {
             InitializeComponent();
-            series1 = new EKG_data(DateTime.Now, DateTime.Now, DateTime.Now.AddMinutes(1));
+            series1 = new EKG_data(DateTime.Now, DateTime.Now, DateTime.Now.AddMinutes(3));
             series1.DateTimeFormat = DateTimeFormat.LongTime;
-            series1.LabelInterval = 10;
+            series1.LabelInterval = 50;
             series1.MinValue = 0;
             series1.MaxValue = 120;
             series1.Title = "ECG";
             series1.SupportedLabels = LabelKinds.XAxisLabel;
 
-
+           
             lineChart1.Series.Add(series1);
 
             lineChart1.Title = "ECG Data";
@@ -105,12 +105,12 @@ namespace vital_sign
 
             lineChart1.XAxis.Title = "";
             lineChart1.XAxis.MinValue = 0;
-            lineChart1.XAxis.MaxValue = 120;
+            lineChart1.XAxis.MaxValue = 10;
             lineChart1.XAxis.Interval = 10;
 
             lineChart1.YAxis.MinValue = 0;
-            lineChart1.YAxis.MaxValue = 100;
-            lineChart1.YAxis.Interval = 10;
+            lineChart1.YAxis.MaxValue = 25;
+            lineChart1.YAxis.Interval = 5;
 
             List<MindFusion.Drawing.Brush> brushes = new List<MindFusion.Drawing.Brush>()
             {
@@ -132,7 +132,7 @@ namespace vital_sign
 
 
             t.Tick += T_Tick;
-            t.Interval = 100;
+            t.Interval = 40;
            
         }
 
@@ -151,14 +151,21 @@ namespace vital_sign
             t.Stop();
         }
 
-
+        double sum =0;
+        int counter = 0;
+        double avg = 0;
 
         private void T_Tick(object sender, EventArgs e)
         {
-           string incoming_data = ASCIIToDecimal(serialPort1.ReadLine()).ToString();
-            richTextBox1.Text = incoming_data;
+            byte incoming_data = (byte)serialPort1.ReadByte();
+            double converted_data = (incoming_data / 10);
+            richTextBox1.Text += converted_data.ToString() + "\n";
 
-            double val = rnd.NextDouble()*10 + 50;
+            sum += converted_data;
+            counter++;
+            avg = sum / counter;
+
+            double val = converted_data;
             series1.addValue(val);
             Console.WriteLine(val);
 

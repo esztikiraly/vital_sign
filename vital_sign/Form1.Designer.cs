@@ -84,7 +84,7 @@
             this.lineChart1.Name = "lineChart1";
             this.lineChart1.Padding = new System.Windows.Forms.Padding(5);
             this.lineChart1.ShowLegend = true;
-            this.lineChart1.Size = new System.Drawing.Size(913, 398);
+            this.lineChart1.Size = new System.Drawing.Size(913, 450);
             this.lineChart1.SubtitleFontName = null;
             this.lineChart1.SubtitleFontSize = null;
             this.lineChart1.SubtitleFontStyle = null;
@@ -99,9 +99,9 @@
             // 
             // richTextBox1
             // 
-            this.richTextBox1.Location = new System.Drawing.Point(112, 430);
+            this.richTextBox1.Location = new System.Drawing.Point(13, 192);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(913, 75);
+            this.richTextBox1.Size = new System.Drawing.Size(49, 270);
             this.richTextBox1.TabIndex = 9;
             this.richTextBox1.Text = "";
             // 
