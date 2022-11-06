@@ -37,8 +37,6 @@
             this.btn_stop = new System.Windows.Forms.Button();
             this.lbl_hr = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btn_open
@@ -87,7 +85,7 @@
             this.lineChart1.Name = "lineChart1";
             this.lineChart1.Padding = new System.Windows.Forms.Padding(5);
             this.lineChart1.ShowLegend = true;
-            this.lineChart1.Size = new System.Drawing.Size(913, 371);
+            this.lineChart1.Size = new System.Drawing.Size(880, 371);
             this.lineChart1.SubtitleFontName = null;
             this.lineChart1.SubtitleFontSize = null;
             this.lineChart1.SubtitleFontStyle = null;
@@ -139,31 +137,11 @@
             this.label3.TabIndex = 14;
             this.label3.Text = "Heart rate:";
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(23, 171);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(44, 16);
-            this.label2.TabIndex = 15;
-            this.label2.Text = "label2";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(23, 201);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(44, 16);
-            this.label4.TabIndex = 16;
-            this.label4.Text = "label4";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1037, 520);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.label2);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.lbl_hr);
             this.Controls.Add(this.btn_stop);
@@ -192,8 +170,6 @@
         private System.Windows.Forms.Button btn_stop;
         private System.Windows.Forms.Label lbl_hr;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label4;
     }
 }
 

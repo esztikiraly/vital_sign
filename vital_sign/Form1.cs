@@ -42,13 +42,16 @@ namespace vital_sign
             lineChart1.Title = "ECG Data";
             lineChart1.ShowXCoordinates = false;
             lineChart1.ShowLegendTitle = false;
-            lineChart1.XAxis.Title = "";
+            lineChart1.XAxis.Title = "Time in milliseconds";
+            lineChart1.YAxis.Title = "mm";
+
             lineChart1.XAxis.MinValue = 0;
-            lineChart1.XAxis.MaxValue = 5;
-            lineChart1.XAxis.Interval = 0.04;
+            lineChart1.XAxis.MaxValue = 2;
+            lineChart1.XAxis.Interval = 0.004;
+
             lineChart1.YAxis.MinValue = 0;
-            lineChart1.YAxis.MaxValue = 250;
-            lineChart1.YAxis.Interval = 15;
+            lineChart1.YAxis.MaxValue = 270;
+            lineChart1.YAxis.Interval = 20;
 
             List<MindFusion.Drawing.Brush> brushes = new List<MindFusion.Drawing.Brush>()
             {
@@ -70,7 +73,7 @@ namespace vital_sign
 
             //timer
             t.Tick += T_Tick;
-            t.Interval = 40;
+            t.Interval = 4;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -149,21 +152,16 @@ namespace vital_sign
         double sum =0;
         int counter = 0;
         double avg = 0;
-        double max = 0;
-        double min = 200;
+
         private void T_Tick(object sender, EventArgs e)
         {
 
             //Get the data from the port 
             byte incoming_data = (byte)serialPort1.ReadByte();
 
+
             //Filter data
             
-
-
-            //showing the max and min value
-            if (incoming_data > max) max = incoming_data;
-            if (incoming_data < min) min = incoming_data;
 
             //calculating avg and sum
             sum += incoming_data;
@@ -171,17 +169,14 @@ namespace vital_sign
             avg = sum / counter;
 
             //show data on the chart
-            double val = incoming_data;
-            if (incoming_data > 0)
+            double val = incoming_data / 1.0;
                 series1.addValue(val);
             Console.WriteLine(val);
 
-            //max and min value
-            label2.Text= max.ToString();
-            label4.Text= min.ToString();
+            
 
             //heart rate calculation
-            if (incoming_data > 20)
+            if (incoming_data > 10)
             {
                 if (R1 == 0)
                 {
@@ -193,7 +188,7 @@ namespace vital_sign
                     {
                         R2 = counter;
                         double RR = R2 - R1;
-                        lbl_hr.Text = (1500/RR).ToString();
+                       // lbl_hr.Text = (1500/RR).ToString();
                         R1 = 0;
                         R2 = 0;
                     }
